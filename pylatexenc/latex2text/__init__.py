@@ -621,6 +621,12 @@ _strict_latex_spaces_predef = {
         'after-comment': False,
         'in-equations': 'based-on-source',
     },
+    'math-all-spaces': {
+        'between-macro-and-chars': False,
+        'between-latex-constructs': False,
+        'after-comment': False,
+        'in-equations': 'based-on-source',
+    },
     'except-in-equations': {
         'between-macro-and-chars': True,
         'between-latex-constructs': True,
@@ -1049,6 +1055,11 @@ class LatexNodes2Text(object):
                     # default behavior (see issue #11), so only do this if the
                     # corresponding `strict_latex_spaces=` flag is set.
                     s += prev_node.macro_post_space
+            elif (self.strict_latex_spaces == _strict_latex_spaces_predef['math-all-spaces'] and
+                  prev_node is not None and
+                  prev_node.isNodeType(latexwalker.LatexMacroNode) and
+                  prev_node.macroname in _math_space_macros):
+                s += ' '
 
             last_nl_pos = s.rfind('\n')
             if last_nl_pos != -1:
@@ -1554,3 +1565,9 @@ def latexnodes2text(nodelist, keep_inline_math=False, keep_comments=False):
         keep_inline_math=keep_inline_math,
         keep_comments=keep_comments
     ).nodelist_to_text(nodelist)
+
+_math_space_macros = frozenset([
+    'mathbb', 'mathrm', 'mathbf', 'mathcal', 'mathsf', 'mathtt', 'mathscr',
+    'mathfrak', 'mathbbm', 'in', 'forall', 'exists', 'notin', 'ni',
+    'cap', 'cup'
+])
